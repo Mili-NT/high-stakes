@@ -14,8 +14,8 @@ Well, you get a nice pat on the back. And blackjack pays double, so you get a pa
 
 
 And remember, 
-***This literally deletes your files. I haven't decided if it'll delete system-critical files yet, but if I do i'll update this disclaimer."***
-*** Do NOT play this anywhere (like a work computer) where you could get in trouble for deleting important files ***
+***This literally deletes your files. I haven't decided if it'll delete system-critical files yet, but if I do i'll update this disclaimer."
+Do NOT play this anywhere (like a work computer) where you could get in trouble for deleting important files***
 
 
 # Coming Soon:
