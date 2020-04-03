@@ -20,5 +20,4 @@ Do NOT play this anywhere (like a work computer) where you could get in trouble 
 
 
 # Coming Soon:
-- The entire game
-- Multiplayer mode, where instead of files being deleted, the winner takes *x* random files from the loser.
+- A working GUI
