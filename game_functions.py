@@ -1,4 +1,3 @@
-import requests
 from tkinter import *
 def card_conversion(card, isCode):
     """
@@ -17,9 +16,7 @@ def card_conversion(card, isCode):
         card_value = card_value if card_value not in values.values() else list(values.keys())[list(values.values()).index(card_value)]
         card_suit = card.split(' of ')[1][:1]
         return f"{card_value}{card_suit}"
-def defeat():
-    pass
-def victory():
-    pass
+
 def load_image(card, isHidden):
     return PhotoImage(file=f"resources/{card}.png") if isHidden is False else PhotoImage(file=f"resources/hidden.png")
+
