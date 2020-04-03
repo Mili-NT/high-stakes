@@ -18,5 +18,10 @@ def card_conversion(card, isCode):
         return f"{card_value}{card_suit}"
 
 def load_image(card, isHidden):
+    """
+    :param card: The card code, which is also the image name
+    :param isHidden: Is this card hidden (any of the dealers cards that arent the first?) if so, display the back side
+    :return: Returns a PhotoImage object of the .png file
+    """
     return PhotoImage(file=f"resources/{card}.png") if isHidden is False else PhotoImage(file=f"resources/hidden.png")
 
