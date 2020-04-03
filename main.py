@@ -41,7 +41,7 @@ class popupWindow(object):
         self.master = master
     def cleanup(self):
         blackjack_gui.file_number = self.e.get()
-        self.master.announce(f"You bet {blackjack_gui.file_number} files!")
+        self.master.announce(f"You bet {blackjack_gui.file_number} files!") # TODO: Yes officer, this line right here
         self.top.destroy()
 class blackjack_gui:
     def __init__(self, root):
