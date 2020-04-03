@@ -1,9 +1,17 @@
 import os
+import ctypes
 import random
 from tkinter import *
-from datetime import datetime
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor # You know its gonna be a fun time when you see this bad boy
+
+def isAdmin():
+    try:
+        is_admin = os.getuid() == 0
+    except AttributeError:
+        is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+    return is_admin
+
 
 def card_conversion(card, isCode):
     """
@@ -56,6 +64,10 @@ def select_files(number_of_files):
     return random.choices(files, k=number_of_files)
 def listremove(filelist):
     with open("history.txt", 'a') as f:
-        for x in filelist:
-            f.write(f"{x}\n")
-            os.remove(x)
+        with open("err.txt", 'a') as err:
+            for x in filelist:
+                try:
+                    os.remove(x)
+                    f.write(f"{x}\n")
+                except PermissionError:
+                    err.write(f"Permission Denied: {x}")

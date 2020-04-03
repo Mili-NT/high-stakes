@@ -54,6 +54,24 @@ class hand:
         drawn = requests.get(f"https://deckofcardsapi.com/api/deck/{deck_id}/draw/?count={count}").json()
         for i in drawn['cards']:
             self.contents[misc_functions.card_conversion(i['code'], True)] = i['value']
+
+class access_denied_window(object):
+
+    def __init__(self, master, blackjack_widget):
+        self.master = master
+        self.blackjack_widget = blackjack_widget
+        self.blackjack_widget.hit_button['state'] = DISABLED
+        self.blackjack_widget.stand_button['state'] = DISABLED
+        top=self.top=Toplevel(master)
+        self.top.attributes("-topmost", True)
+        self.l = ttk.Label(top,text="Hey now! This ain't being run as admin/root. You aren't trying to\n"
+                                    "weasel your way out of paying up are you?")
+        self.l.pack()
+        self.b = ttk.Button(top, text='Close (Run Script As Admin/Root)', command=self.cleanup)
+        self.b.pack()
+    def cleanup(self):
+        self.top.destroy()
+        self.master.destroy()
 class file_entry_window(object):
     """
     This class handles the popup that takes the bets.
@@ -95,10 +113,13 @@ class outcome_window(object):
     It takes the root of the blackjack_gui class and the outcome as parameters
     It destroys() the root window upon closing
     """
-    def __init__(self, master, outcome, fileno):
+    def __init__(self, master, blackjack_widget, outcome, fileno):
         self.master = master
         top=self.top=Toplevel(master)
-        self.fileno = fileno
+        self.fileno = int(fileno.get())
+        self.blackjack_widget = blackjack_widget
+        self.blackjack_widget.hit_button['state'] = DISABLED
+        self.blackjack_widget.stand_button['state'] = DISABLED
         if outcome == 'win':
             self.l = ttk.Label(top,text="You won! Your files live another day")
             self.b = ttk.Button(top, text='Close', command=self.cleanup)
@@ -163,7 +184,10 @@ class blackjack_gui:
         self.opponent_label.pack()
         self.player_label.pack()
         self.file_number = IntVar()
-        file_entry_window(root, self)
+        if misc_functions.isAdmin() is False:
+            access_denied_window(root, self)
+        else:
+            file_entry_window(root, self)
 
 
     #
@@ -202,7 +226,7 @@ class blackjack_gui:
             message = f"You won with {outcome_announcement}! Good job!" if outcome == 'win' else f"You lost with {outcome_announcement}! Too bad!"
             self.announce(message)
         # Calls the outcomeWindow and passes the outcome to it
-        outcome_window(root, outcome, self.file_number)
+        outcome_window(root, self, outcome, self.file_number)
     def check_bust(self):
         """
         :return: Returns True if bust and False if not
@@ -213,11 +237,11 @@ class blackjack_gui:
         dealer_score = self.dealer_hand.calculate_score()
         if player_score > 21:
             self.announce(f"You busted with a {player_score}! Too bad!")
-            outcome_window(root, 'loss', self.file_number)
+            outcome_window(root, self, 'loss', self.file_number)
             return True
         if dealer_score > 21:
             self.announce(f"The dealer busted with a {dealer_score}! You win!")
-            outcome_window(root, 'win', self.file_number)
+            outcome_window(root, self, 'win', self.file_number)
             return True
         return False
     def deal(self):
@@ -285,6 +309,7 @@ class blackjack_gui:
 #
 # Main:
 #
+
 if __name__ == '__main__':
     root = Tk()
     interface = blackjack_gui(root)
