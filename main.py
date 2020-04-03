@@ -1,5 +1,5 @@
 import requests
-import game_functions
+import misc_functions
 from datetime import datetime
 from tkinter import *
 from tkinter import ttk
@@ -14,7 +14,7 @@ class hand:
 
     def calculate_score(self):
         nonstandard = ['J', 'Q', 'K', '0']
-        converted = [game_functions.card_conversion(val, False) for val in self.contents]
+        converted = [misc_functions.card_conversion(val, False) for val in self.contents]
         values = [val[0] if val[0] not in nonstandard else '10' for val in converted]
         if 'A' in values:
             low = sum([int(value) if value != 'A' else 1 for value in values])
@@ -27,7 +27,7 @@ class hand:
     def draw_cards(self, deck_id, count):
         drawn = requests.get(f"https://deckofcardsapi.com/api/deck/{deck_id}/draw/?count={count}").json()
         for i in drawn['cards']:
-            self.contents[game_functions.card_conversion(i['code'], True)] = i['value']
+            self.contents[misc_functions.card_conversion(i['code'], True)] = i['value']
 
 class outcomeWindow(object):
     def __init__(self,master, outcome):
@@ -117,7 +117,7 @@ class blackjack_gui:
     def deal(self):
         draw = requests.get(f"https://deckofcardsapi.com/api/deck/{self.deck_id}/draw/?count=2").json()
         for i in draw['cards']:
-            card_name = game_functions.card_conversion(i['code'], True)
+            card_name = misc_functions.card_conversion(i['code'], True)
             self.player_hand.contents[card_name] = i['value']
             self.announce(f"You drew {'an' if card_name[0] in ['A', 'E', 'I', 'O', 'U'] else 'a'} {card_name}")
         self.announce(f"Your score is {self.player_hand.calculate_score()}")
@@ -126,7 +126,7 @@ class blackjack_gui:
     def hit(self):
         hit = requests.get(f"https://deckofcardsapi.com/api/deck/{self.deck_id}/draw/?count=1").json()
         for i in hit['cards']:
-            card_name = game_functions.card_conversion(i['code'], True)
+            card_name = misc_functions.card_conversion(i['code'], True)
             self.player_hand.contents[card_name] = i['value']
             self.announce(f"You drew {'an' if card_name[0] in ['A', 'E', 'I', 'O', 'U'] else 'a'} {card_name}")
             self.announce(f"Your score is {self.player_hand.calculate_score()}")
