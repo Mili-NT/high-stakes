@@ -4,9 +4,9 @@ from datetime import datetime
 from tkinter import *
 from tkinter import ttk
 
-
-# TODO: Card drawing (oh boy)
-# TODO: File entry and defeat function
+# TODO: 1. Fix windows, they need scale, but not change size
+# TODO: 2. Card Drawing
+# TODO: 3. File entry and defeat function
 
 #
 # Classes:

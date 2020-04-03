@@ -16,7 +16,6 @@ def card_conversion(card, isCode):
         card_value = card_value if card_value not in values.values() else list(values.keys())[list(values.values()).index(card_value)]
         card_suit = card.split(' of ')[1][:1]
         return f"{card_value}{card_suit}"
-
 def load_image(card, isHidden):
     """
     :param card: The card code, which is also the image name
