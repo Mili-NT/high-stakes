@@ -17,10 +17,8 @@ And remember,
 
 ***This literally deletes your files. I haven't decided if it'll delete system-critical files yet, but if I do i'll update this disclaimer.***
 ***Do NOT play this anywhere (like a work computer) where you could get in trouble for deleting important files***
-
-
-### A big shoutout to crobertsbmw for making and maintaining the API used for the cards. 
-### [Check it out.](https://github.com/crobertsbmw/deckofcards)
+## -------------------------------------------------------------------------------------
+### A big shoutout to crobertsbmw for making DeckOfCards API. [Check it out.](https://github.com/crobertsbmw/deckofcards)
 
 # Coming Soon:
 - A working GUI
