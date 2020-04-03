@@ -54,7 +54,7 @@ class hand:
         drawn = requests.get(f"https://deckofcardsapi.com/api/deck/{deck_id}/draw/?count={count}").json()
         for i in drawn['cards']:
             self.contents[misc_functions.card_conversion(i['code'], True)] = i['value']
-class outcomeWindow(object):
+class outcome_window(object):
     """
     The outcomeWindow class creates and manages the popup window that announces the end of the game.
     It takes the root of the blackjack_gui class and the outcome as parameters
@@ -84,8 +84,9 @@ class blackjack_gui:
     Game Functions: decide_outcome(), check_bust(), deal(), hit(), stand()
     """
     def __init__(self, root):
+        # Basic setup, such as window title and geometry, hand initialization, deck_id fetching
         self.root = root
-        self.file_number = 0
+        self.file_number = 0 # This is how many files the player bets. To be implemented
         self.root.title("High-Stakes")
         self.root.geometry("600x400")
         self.dealer_hand = hand({})
@@ -97,25 +98,21 @@ class blackjack_gui:
         self.right = ttk.Frame(self.root, borderwidth=2, relief="solid")
         self.opponent_cards = Canvas(self.left, borderwidth=2, relief="solid")
         self.player_cards = Canvas(self.right, borderwidth=2, relief="solid")
-        # Announcements:
         self.announcements = Canvas(self.left, borderwidth=2, relief="solid")
-        self.scrollbar = ttk.Scrollbar(self.announcements)
-        self.announcements_label = ttk.Label(self.announcements, text="Announcements")
-        # Announcements packing:
-        self.announcements.pack(side="bottom", expand=True, fill="both", padx=5, pady=5)
-        self.scrollbar.pack(side=RIGHT, fill=Y)
-        self.announcements_label.pack()
-        # Buttons:
+        # Buttons And Widgets:
         self.hit_button = Button(self.right, text="Hit", command=lambda: self.hit())
         self.stand_button = Button(self.right, text="Stand", command=lambda: self.stand(True))
+        self.scrollbar = ttk.Scrollbar(self.announcements)
         # Labels:
         self.opponent_label = ttk.Label(self.opponent_cards, text="Opponent's Cards")
         self.player_label = ttk.Label(self.player_cards, text="Your Cards")
-        #self.hit_label = Label(self.hit_button, text="Hit", fg="black")
-        #self.stand_label = Label(self.stand_button, text="Stand", fg="black")
+        self.announcements_label = ttk.Label(self.announcements, text="Announcements")
         # Packing:
         self.left.pack(side="left", expand=True, fill="both")
         self.right.pack(side="right", expand=True, fill="both")
+        self.announcements.pack(side="bottom", expand=True, fill="both", padx=5, pady=5)
+        self.scrollbar.pack(side=RIGHT, fill=Y)
+        self.announcements_label.pack()
         self.stand_button.pack(side="bottom")
         self.hit_button.pack(side="bottom")
         self.opponent_cards.pack(expand=True, fill="both", padx=5, pady=5)
@@ -139,16 +136,24 @@ class blackjack_gui:
         player_score = self.player_hand.calculate_score()
         dealer_score = self.dealer_hand.calculate_score()
         outcome_announcement = f"{player_score} to the dealer's {dealer_score}"
-        # Compares scores
-        if player_score == dealer_score:
+        # Blackjack cases
+        if player_score == 21:
+            self.announce(f"BLACKJACK! You won {outcome_announcement}!")
+            outcome = 'win'
+        elif dealer_score == 21:
+            self.announce(f"The dealer got blackjack! You lost {outcome_announcement}!")
+            outcome = 'loss'
+        # Tie case
+        elif player_score == dealer_score:
             self.announce(f"You and the dealer tied with {dealer_score} points!")
             outcome = 'tie'
+        # Score comparison
         else:
             outcome = 'loss' if dealer_score > player_score else 'win'
             message = f"You won with {outcome_announcement}! Good job!" if outcome == 'win' else f"You lost with {outcome_announcement}! Too bad!"
             self.announce(message)
         # Calls the outcomeWindow and passes the outcome to it
-        outcomeWindow(root, outcome)
+        outcome_window(root, outcome)
     def check_bust(self):
         """
         :return: Returns True if bust and False if not
@@ -159,11 +164,11 @@ class blackjack_gui:
         dealer_score = self.dealer_hand.calculate_score()
         if player_score > 21:
             self.announce(f"You busted with a {player_score}! Too bad!")
-            outcomeWindow(root, 'loss')
+            outcome_window(root, 'loss')
             return True
         if dealer_score > 21:
             self.announce(f"The dealer busted with a {dealer_score}! You win!")
-            outcomeWindow(root, 'win')
+            outcome_window(root, 'win')
             return True
         return False
     def deal(self):
@@ -174,10 +179,14 @@ class blackjack_gui:
         self.announce("The Game Has Started!")
         draw = requests.get(f"https://deckofcardsapi.com/api/deck/{self.deck_id}/draw/?count=2").json()
         # The player draws:
+        player_dealt_cards = [] # This variable is to store the drawn card names for making the announcement
         for i in draw['cards']:
             card_name = misc_functions.card_conversion(i['code'], True)
             self.player_hand.contents[card_name] = i['value']
-            self.announce(f"You drew {'an' if card_name[0] in ['A', 'E', 'I', 'O', 'U'] else 'a'} {card_name}")
+            # Appends the card name along with the correct article
+            player_dealt_cards.append(f"{'an' if card_name[0] in ['A', 'E', 'I', 'O', 'U'] else 'a'} {card_name}")
+        # Because there are only ever 2 cards dealt initally, we can just access by index
+        self.announce(f"You drew {player_dealt_cards[0]} and {player_dealt_cards[1]}")
         self.announce(f"Your score is {self.player_hand.calculate_score()}")
         # The dealer draws:
         self.dealer_hand.draw_cards(self.deck_id, 2)
@@ -187,23 +196,32 @@ class blackjack_gui:
         This function is bound to the blackjack_gui.hit_button().
         It allows the player to add one card to their deck, and also allows the dealer to either stand or hit
         """
+        player_score = self.player_hand.calculate_score()
+        dealer_score = self.dealer_hand.calculate_score()
         # Player hitting:
         hit = requests.get(f"https://deckofcardsapi.com/api/deck/{self.deck_id}/draw/?count=1").json()
         for i in hit['cards']:
             card_name = misc_functions.card_conversion(i['code'], True)
             self.player_hand.contents[card_name] = i['value']
             self.announce(f"You drew {'an' if card_name[0] in ['A', 'E', 'I', 'O', 'U'] else 'a'} {card_name}")
-            self.announce(f"Your score is {self.player_hand.calculate_score()}")
+            self.announce(f"Your score is {player_score}")
+            # If the player gets blackjack
+            if player_score == 21:
+                self.decide_outcome()
         # This is why blackjack_gui.check_bust() returns True if it busts
         if self.check_bust() is False:
             # Dealer stands on 17 or higher
-            if self.dealer_hand.calculate_score() >= 17:
+            if dealer_score >= 17:
                 self.stand(False)
             else:
                 # Dealer draws, and then it checks for a bust
                 self.announce("The dealer draws a card!")
                 self.dealer_hand.draw_cards(self.deck_id, 1)
-                self.check_bust()
+                # If the dealer gets blackjack:
+                if dealer_score == 21:
+                    self.decide_outcome()
+                else:
+                    self.check_bust()
     def stand(self, userStand):
         """
         :param userStand: True if its the player standing (aka the blackjack_gui.stand_button() was pressed) and False
