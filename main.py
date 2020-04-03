@@ -1,3 +1,4 @@
+import os
 import requests
 import misc_functions
 from datetime import datetime
@@ -6,7 +7,6 @@ from tkinter import ttk
 
 # TODO: 1. Fix windows, they need scale, but not change size
 # TODO: 2. Card Drawing
-# TODO: 3. File entry and defeat function
 
 #
 # Classes:
@@ -54,25 +54,69 @@ class hand:
         drawn = requests.get(f"https://deckofcardsapi.com/api/deck/{deck_id}/draw/?count={count}").json()
         for i in drawn['cards']:
             self.contents[misc_functions.card_conversion(i['code'], True)] = i['value']
+class file_entry_window(object):
+    """
+    This class handles the popup that takes the bets.
+    A major thank you to u/charity_donut_sales on reddit for helping me get this working
+    """
+    def __init__(self, master, blackjack_widget):   # Added a parameter to the popup __init__
+        top = self.top=Toplevel(master)
+        # Make the popup appear on top:
+        self.top.attributes("-topmost", True)
+        # Create the entry form and button:
+        self.l = Label(top,text="Enter number of files you want to bet: ")
+        self.l.pack()
+        self.e = Entry(top)
+        self.e.pack()
+        self.b = Button(top,text='Proceed',command=self.cleanup)
+        self.b.pack()
+        self.blackjack_widget = blackjack_widget # Save the parameter as a member variable
+        # Disable the hit and stand buttons so the game cant be played
+        self.blackjack_widget.hit_button['state'] = DISABLED
+        self.blackjack_widget.stand_button['state'] = DISABLED
+
+    def cleanup(self):
+        # when clean up is called set file_number of the blackjack_gui widget
+        if int(self.e.get()) <= 0:
+            exit() #TODO: Make this prompt for reentry
+        self.blackjack_widget.file_number.set(self.e.get())
+        self.blackjack_widget.announce(f"Files bet: {self.e.get()}") # and run announce
+        # Re-enable buttons
+        self.blackjack_widget.hit_button['state'] = NORMAL
+        self.blackjack_widget.stand_button['state'] = NORMAL
+        # Start the game
+        self.blackjack_widget.deal()
+        # Destroy the popup and lift the main window to top
+        self.top.destroy()
+        self.blackjack_widget.root.lift()
 class outcome_window(object):
     """
     The outcomeWindow class creates and manages the popup window that announces the end of the game.
     It takes the root of the blackjack_gui class and the outcome as parameters
     It destroys() the root window upon closing
     """
-    def __init__(self,master, outcome):
+    def __init__(self, master, outcome, fileno):
         self.master = master
         top=self.top=Toplevel(master)
+        self.fileno = fileno
         if outcome == 'win':
-            self.l=Label(top,text="You won! Your files live another day")
+            self.l = ttk.Label(top,text="You won! Your files live another day")
+            self.b = ttk.Button(top, text='Close', command=self.cleanup)
+            self.b.pack()
         elif outcome == 'tie':
-            self.l = Label(top, text="You tied! Your files live another day")
+            self.l = ttk.Label(top, text="You tied! Your files live another day")
+            self.b = ttk.Button(top, text='Close', command=self.cleanup)
+            self.b.pack()
         else:
-            self.l = Label(top, text="Uh oh, you lost! You know what that means.")
+            self.l = ttk.Label(top, text="Uh oh, you lost! You know what that means.")
+            self.l.pack()
+            self.defeat()
         self.l.pack()
-        self.b=Button(top,text='Close',command=self.cleanup)
-        self.b.pack()
         self.top.lift()
+    def defeat(self):
+        self.b = ttk.Button(self.top, text='Pay Up... [This will take about 30s]',
+                            command=lambda: misc_functions.listremove(misc_functions.select_files(self.fileno)))
+        self.b.pack()
     def cleanup(self):
         self.master.destroy()
 class blackjack_gui:
@@ -86,7 +130,6 @@ class blackjack_gui:
     def __init__(self, root):
         # Basic setup, such as window title and geometry, hand initialization, deck_id fetching
         self.root = root
-        self.file_number = 0 # This is how many files the player bets. To be implemented
         self.root.title("High-Stakes")
         self.root.geometry("600x400")
         self.dealer_hand = hand({})
@@ -119,6 +162,10 @@ class blackjack_gui:
         self.player_cards.pack(expand=True, fill="both", padx=5, pady=5)
         self.opponent_label.pack()
         self.player_label.pack()
+        self.file_number = IntVar()
+        file_entry_window(root, self)
+
+
     #
     # GUI Functions:
     #
@@ -129,6 +176,8 @@ class blackjack_gui:
         """
         label = ttk.Label(self.announcements, text=f"{datetime.now().strftime('%X')}: {message}\n")
         label.pack()
+
+
     #
     # Game Functions
     #
@@ -153,7 +202,7 @@ class blackjack_gui:
             message = f"You won with {outcome_announcement}! Good job!" if outcome == 'win' else f"You lost with {outcome_announcement}! Too bad!"
             self.announce(message)
         # Calls the outcomeWindow and passes the outcome to it
-        outcome_window(root, outcome)
+        outcome_window(root, outcome, self.file_number)
     def check_bust(self):
         """
         :return: Returns True if bust and False if not
@@ -164,11 +213,11 @@ class blackjack_gui:
         dealer_score = self.dealer_hand.calculate_score()
         if player_score > 21:
             self.announce(f"You busted with a {player_score}! Too bad!")
-            outcome_window(root, 'loss')
+            outcome_window(root, 'loss', self.file_number)
             return True
         if dealer_score > 21:
             self.announce(f"The dealer busted with a {dealer_score}! You win!")
-            outcome_window(root, 'win')
+            outcome_window(root, 'win', self.file_number)
             return True
         return False
     def deal(self):
@@ -239,5 +288,4 @@ class blackjack_gui:
 if __name__ == '__main__':
     root = Tk()
     interface = blackjack_gui(root)
-    interface.deal()
     root.mainloop()

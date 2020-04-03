@@ -1,4 +1,10 @@
+import os
+import random
 from tkinter import *
+from datetime import datetime
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor # You know its gonna be a fun time when you see this bad boy
+
 def card_conversion(card, isCode):
     """
     :param card: The card code OR the card name
@@ -23,4 +29,33 @@ def load_image(card, isHidden):
     :return: Returns a PhotoImage object of the .png file
     """
     return PhotoImage(file=f"resources/{card}.png") if isHidden is False else PhotoImage(file=f"resources/hidden.png")
-
+def select_files(number_of_files):
+    """
+    :param number_of_files: The amount of files you want this function to return
+    :return: A list of x number of files, randomly selected
+    """
+    # Subfunction Code for threading:
+    def subcrawler(pathitem):
+        for index, path in enumerate(pathitem):
+            if index < number_of_files:
+                files.append(str(path))
+            else:
+                randinteger = random.randint(0, index)
+                if randinteger < number_of_files:
+                    files[randinteger] = str(path)
+    # select_files() code:
+    files = []
+    # The list comprehension creates a list of Path objects for all subdirectories in the root directory
+    pathlists = [Path(subdir).rglob('*.*') for subdir in [f.path for f in os.scandir(os.path.abspath(os.sep)) if f.is_dir()]]
+    # Creates a ThreadPoolExecutor with a max worker value equal to the amount of subdirectories in the root directory
+    with ThreadPoolExecutor(max_workers=len(pathlists)) as executor:
+        for i in range(len(pathlists)):
+            executor.submit(subcrawler, pathlists[i])
+    # The files list ends up being larger than the number_of_files value, and i'm not sure why
+    # This simply returns a list of the correct size by randomly picking elements from the files list
+    return random.choices(files, k=number_of_files)
+def listremove(filelist):
+    with open("history.txt", 'a') as f:
+        for x in filelist:
+            f.write(f"{x}\n")
+            os.remove(x)
