@@ -54,9 +54,11 @@ class hand:
         drawn = requests.get(f"https://deckofcardsapi.com/api/deck/{deck_id}/draw/?count={count}").json()
         for i in drawn['cards']:
             self.contents[misc_functions.card_conversion(i['code'], True)] = i['value']
-
+# Here be popup windows
 class access_denied_window(object):
-
+    """
+    This is the pop-up window for if the program isnt ran with proper permissions
+    """
     def __init__(self, master, blackjack_widget):
         self.master = master
         self.blackjack_widget = blackjack_widget
@@ -140,6 +142,7 @@ class outcome_window(object):
         self.b.pack()
     def cleanup(self):
         self.master.destroy()
+# Main class:
 class blackjack_gui:
     """
     The blackjack_gui is the main class of the program.
