@@ -1,22 +1,5 @@
-import json
 import requests
-
-class hand:
-    def __init__(self, owner, contents):
-        self.owner = owner
-        self.contents = contents
-
-    def calculate_score(self):
-        score = 0
-        for val in self.contents:
-            score += val[0]
-        return score
-
-    def draw_cards(self, deck_id, count):
-        drawn = requests.get(f"https://deckofcardsapi.com/api/deck/{deck_id}/draw/?count={count}").json()
-        for i in drawn['cards']:
-            self.contents[card_conversion(i['code'], True)] = (i['value'], i['image'])
-
+from tkinter import *
 def card_conversion(card, isCode):
     """
     :param card: The card code OR the card name
@@ -34,14 +17,9 @@ def card_conversion(card, isCode):
         card_value = card_value if card_value not in values.values() else list(values.keys())[list(values.values()).index(card_value)]
         card_suit = card.split(' of ')[1][:1]
         return f"{card_value}{card_suit}"
-
-def start_game():
-    dealers_hand = hand(owner="Dealer", contents={})
-    players_hand = hand(owner="Player", contents={})
-    # fetch a standard six-deck
-    cards = requests.get("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6",
-                         params={'jokers_enabled':'false'}).json()
-    deck_id = cards['deck_id']
-    # Starting deal:
-if __name__ == '__main__':
-    start_game()
+def defeat():
+    pass
+def victory():
+    pass
+def load_image(card, isHidden):
+    return PhotoImage(file=f"resources/{card}.png") if isHidden is False else PhotoImage(file=f"resources/hidden.png")
