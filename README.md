@@ -19,5 +19,7 @@ And remember,
 Do NOT play this anywhere (like a work computer) where you could get in trouble for deleting important files***
 
 
+### A big shoutout to crobertsbmw for making and maintaining the API used for the cards. [Check it out.](https://github.com/crobertsbmw/deckofcards)
+
 # Coming Soon:
 - A working GUI
