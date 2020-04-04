@@ -6,6 +6,9 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor # You know its gonna be a fun time when you see this bad boy
 
 def isAdmin():
+    """
+    :return: True if script is ran as admin/root, otherwise False
+    """
     try:
         is_admin = os.getuid() == 0
     except AttributeError:
@@ -63,6 +66,10 @@ def select_files(number_of_files):
     # This simply returns a list of the correct size by randomly picking elements from the files list
     return random.choices(files, k=number_of_files)
 def listremove(filelist):
+    """
+    :param filelist: The list of files to remove, from select_files()
+    :return: Nothing
+    """
     with open("history.txt", 'a') as f:
         with open("err.txt", 'a') as err:
             for x in filelist:

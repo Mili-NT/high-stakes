@@ -4,11 +4,12 @@ from tkinter import ttk
 
 class access_denied_window(object):
     """
-    This is the pop-up window for if the program isnt ran with proper permissions
+    This is the pop-up window for if the program isn't ran with proper permissions
     """
     def __init__(self, master, blackjack_widget):
         self.master = master
         self.blackjack_widget = blackjack_widget
+        # Disable the game:
         self.blackjack_widget.hit_button['state'] = DISABLED
         self.blackjack_widget.stand_button['state'] = DISABLED
         top=self.top=Toplevel(master)
@@ -19,6 +20,7 @@ class access_denied_window(object):
         self.b = ttk.Button(top, text='Close (Run Script As Admin/Root)', command=self.cleanup)
         self.b.pack()
     def cleanup(self):
+        # destroy() both the popup and main window
         self.top.destroy()
         self.master.destroy()
 class file_entry_window(object):

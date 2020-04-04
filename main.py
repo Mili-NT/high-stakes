@@ -225,7 +225,6 @@ class blackjack_gui:
 #
 # Main:
 #
-
 if __name__ == '__main__':
     root = Tk()
     interface = blackjack_gui(root)
