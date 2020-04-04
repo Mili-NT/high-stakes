@@ -74,11 +74,11 @@ class blackjack_gui:
         self.deck_id = requests.get("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6",
                          params={'jokers_enabled':'false'}).json()['deck_id']
         # Frames And Canvases:
-        self.left = ttk.Frame(self.root, borderwidth=2, relief="solid")
-        self.right = ttk.Frame(self.root, borderwidth=2, relief="solid")
-        self.opponent_cards = Canvas(self.left, borderwidth=2, relief="solid")
-        self.player_cards = Canvas(self.right, borderwidth=2, relief="solid")
-        self.announcements = Canvas(self.left, borderwidth=2, relief="solid")
+        self.left = ttk.Frame(self.root, borderwidth=2, relief="solid", width=791, height=841)
+        self.right = ttk.Frame(self.root, borderwidth=2, relief="solid", width=745, height=841)
+        self.opponent_cards = Canvas(self.left, borderwidth=2, relief="solid", width=777, height=393)
+        self.player_cards = Canvas(self.right, borderwidth=2, relief="solid", width=731, height=775)
+        self.announcements = Canvas(self.left, borderwidth=2, relief="solid", width=777, height=424)
         # Buttons And Widgets:
         self.hit_button = Button(self.right, text="Hit", command=lambda: self.hit())
         self.stand_button = Button(self.right, text="Stand", command=lambda: self.stand(True))
@@ -116,7 +116,6 @@ class blackjack_gui:
         """
         label = ttk.Label(self.announcements, text=f"{datetime.now().strftime('%X')}: {message}\n")
         label.pack()
-
 
     #
     # Game Functions
