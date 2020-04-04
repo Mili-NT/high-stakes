@@ -1,5 +1,5 @@
 :: https://stackoverflow.com/a/27083780
-:: This simply runs main.py as admin, after a UAC prompt
+:: This simply runs main.py as admin, after a UAC prompt. On linux, simply sudo python3 main.py
 <!-- : --- Self-Elevating Batch Script ---------------------------
 @whoami /groups | find "S-1-16-12288" > nul && goto :admin
 set "ELEVATE_CMDLINE=cd /d "%~dp0" & call "%~f0" %*"
