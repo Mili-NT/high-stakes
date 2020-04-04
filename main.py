@@ -185,29 +185,27 @@ class blackjack_gui:
         This function is bound to the blackjack_gui.hit_button().
         It allows the player to add one card to their deck, and also allows the dealer to either stand or hit
         """
-        player_score = self.player_hand.calculate_score()
-        dealer_score = self.dealer_hand.calculate_score()
         # Player hitting:
         hit = requests.get(f"https://deckofcardsapi.com/api/deck/{self.deck_id}/draw/?count=1").json()
         for i in hit['cards']:
             card_name = misc_functions.card_conversion(i['code'], True)
             self.player_hand.contents[card_name] = i['value']
             self.announce(f"You drew {'an' if card_name[0] in ['A', 'E', 'I', 'O', 'U'] else 'a'} {card_name}")
-            self.announce(f"Your score is {player_score}")
+            self.announce(f"Your score is {self.player_hand.calculate_score()}")
             # If the player gets blackjack
-            if player_score == 21:
+            if self.player_hand.calculate_score() == 21:
                 self.decide_outcome()
         # This is why blackjack_gui.check_bust() returns True if it busts
         if self.check_bust() is False:
             # Dealer stands on 17 or higher
-            if dealer_score >= 17:
+            if self.dealer_hand.calculate_score() >= 17:
                 self.stand(False)
             else:
                 # Dealer draws, and then it checks for a bust
                 self.announce("The dealer draws a card!")
                 self.dealer_hand.draw_cards(self.deck_id, 1)
                 # If the dealer gets blackjack:
-                if dealer_score == 21:
+                if self.dealer_hand.calculate_score() == 21:
                     self.decide_outcome()
                 else:
                     self.check_bust()
