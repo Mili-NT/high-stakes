@@ -21,4 +21,4 @@ And remember,
 ### A big shoutout to crobertsbmw for making DeckOfCards API. [Check it out.](https://github.com/crobertsbmw/deckofcards)
 
 # Coming Soon:
-- A working GUI
+- Card graphics
