@@ -1,4 +1,6 @@
 # Library Imports
+import sys
+import ctypes
 import requests
 from datetime import datetime
 from tkinter import *
@@ -223,6 +225,9 @@ class blackjack_gui:
 # Main:
 #
 if __name__ == '__main__':
-    root = Tk()
-    interface = blackjack_gui(root)
-    root.mainloop()
+    if misc_functions.isAdmin():
+        root = Tk()
+        interface = blackjack_gui(root)
+        root.mainloop()
+    else:
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
