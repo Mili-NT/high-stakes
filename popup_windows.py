@@ -46,8 +46,11 @@ class file_entry_window(object):
 
     def cleanup(self):
         # when clean up is called set file_number of the blackjack_gui widget
-        if int(self.e.get()) <= 0:
-            exit() #TODO: Make this prompt for reentry
+        try: #TODO: Make this prompt for reentry
+            if int(self.e.get()) <= 0:
+                exit()
+        except ValueError:
+            exit()
         self.blackjack_widget.file_number.set(self.e.get())
         self.blackjack_widget.announce(f"Files bet: {self.e.get()}") # and run announce
         # Re-enable buttons

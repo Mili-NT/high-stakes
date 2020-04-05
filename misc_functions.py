@@ -33,13 +33,6 @@ def card_conversion(card, isCode):
         card_value = card_value if card_value not in values.values() else list(values.keys())[list(values.values()).index(card_value)]
         card_suit = card.split(' of ')[1][:1]
         return f"{card_value}{card_suit}"
-def load_image(card, isHidden):
-    """
-    :param card: The card code, which is also the image name
-    :param isHidden: Is this card hidden (any of the dealers cards that arent the first?) if so, display the back side
-    :return: Returns a PhotoImage object of the .png file
-    """
-    return PhotoImage(file=f"resources/{card}.png") if isHidden is False else PhotoImage(file=f"resources/hidden.png")
 def select_files(number_of_files):
     """
     :param number_of_files: The amount of files you want this function to return
